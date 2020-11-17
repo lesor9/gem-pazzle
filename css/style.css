@@ -7,11 +7,7 @@
     background: #8ed790;
     padding: 2px;
     border: 1px solid #444;
-    transition: all .5s ease-in;
-    -webkit-transition: all .5s ease-in;
-    -moz-transition: all .5s ease-in;
-    -ms-transition: all .5s ease-in;
-    -o-transition: all .5s ease-in;
+    transition: 1s;
 }
 
 .puzzle {
@@ -26,6 +22,31 @@
     text-align: center;
     line-height: 120px;
     cursor: pointer;
+    transition: .3s;
+    position: relative;
+    left: 0;
+    top: 0;
+    user-select: none;
+}
+
+.puzzle-drag {
+    transition: 0s;
+}
+
+.right {
+    left: 140px;
+}
+
+.left {
+    left: -140px;
+}
+
+.top {
+    top: -140px;
+}
+
+.bottom {
+    top: 140px;
 }
 
 .puzzle:hover {
