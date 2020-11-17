@@ -39,7 +39,7 @@ document.body.appendChild(document.createElement('hr')).classList.add('line');
 
 
 createField();
-function createField (N = 4) {
+function createField (N = 3) {
     numberOfAllPazzles = N * N;
 
     document.documentElement.style.setProperty('--pazzleSize', `${( 420 - (5 * (N - 1) ) ) / N}px`);
@@ -54,6 +54,13 @@ function createField (N = 4) {
     let emptyCell = Math.floor(Math.random() * numberOfAllPazzles) + 1;
     console.log(`Пустая: ${emptyCell}`);
 
+    let myNewSet = new Set();
+    while ([...myNewSet].length != numberOfAllPazzles - 1) {
+        myNewSet.add(Math.floor(Math.random() * (numberOfAllPazzles - 1)) + 1);
+    }
+    
+    const arrayElems = [...myNewSet];
+
     for (let i = 1; i <= numberOfAllPazzles; i++) {
 
         const puzzle = document.createElement('div');
@@ -61,7 +68,8 @@ function createField (N = 4) {
 
         if (i === emptyCell) continue;
 
-        puzzle.innerHTML = i;
+        puzzle.innerHTML = arrayElems[i - 1];
+        if (arrayElems[i - 1] === undefined) puzzle.innerHTML = arrayElems[emptyCell - 1];
         puzzle.classList.add("puzzle");
 
         let isMoved = false;
@@ -155,6 +163,10 @@ function createField (N = 4) {
                 }  
             }
 
+            setTimeout(() => {
+                isFinished(numberOfAllPazzles);
+            }, 300);
+            
             console.log('============');
         });
 
@@ -218,3 +230,28 @@ function index(el) {
     }
     return -1;
 }
+
+function isFinished(N) {
+    let field = document.querySelector(`.game-board`).children;
+    const elems = [],
+          finishedArr = [];
+
+    for (let i = 0; i < N; i++) {
+        finishedArr.push(i + 1);
+        elems.push(Number(field[i].innerHTML));
+    }
+    finishedArr.pop();
+    finishedArr.push(0);
+    
+    let isFinish = true; 
+    for (let i = 0; i < N; i++) {
+        if (elems[i] !== finishedArr[i]) {
+            isFinish = false;
+            break;
+        }
+    }
+
+    if (isFinish) {
+        alert("Вы прошли!!!!");
+    }
+};
