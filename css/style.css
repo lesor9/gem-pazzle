@@ -1,9 +1,15 @@
+:root {
+    --pazzleSize: 130px;
+    --pazzleMove: 140px;
+    --pazzleMoveMinus: -140px;
+}
+
 .game-board {
     display: grid;
     position: relative;
     margin: auto;
     max-width: 420px;
-    grid-gap: 2px;
+    grid-gap: 5px;
     background: #8ed790;
     padding: 2px;
     border: 1px solid #444;
@@ -11,8 +17,8 @@
 }
 
 .puzzle {
-    width: 130px;
-    height: 130px;
+    width: var(--pazzleSize);
+    height: var(--pazzleSize);
     background-color: #444;
     border-radius: 10%;
     align-self: center;
@@ -20,7 +26,7 @@
     font-size: 60px;
     color: white;
     text-align: center;
-    line-height: 120px;
+    line-height: var(--pazzleSize);
     cursor: pointer;
     transition: .3s;
     position: relative;
@@ -34,21 +40,38 @@
 }
 
 .right {
-    left: 140px;
+    left: var(--pazzleMove);
 }
 
 .left {
-    left: -140px;
+    left: var(--pazzleMoveMinus);
 }
 
 .top {
-    top: -140px;
+    top: var(--pazzleMoveMinus);
 }
 
 .bottom {
-    top: 140px;
+    top: var(--pazzleMove);
 }
 
 .puzzle:hover {
     background-color: #333;
+}
+
+.line {
+    width: 80%;
+}
+
+.settings {
+    width: 80%;
+    height: 100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.select {
+    border-bottom: 2px solid currentcolor; 
 }
