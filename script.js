@@ -172,7 +172,7 @@ async function createField (emptyCell, arrayElems, N) {
 
 
         
-        puzzle.style.setProperty('background', `no-repeat url(.././assets/images/${numOfImage}.jpg) ${fir}% ${sec}% / ${N * 100}%`);
+        puzzle.style.setProperty('background', `no-repeat url(./assets/images/${numOfImage}.jpg) ${fir}% ${sec}% / ${N * 100}%`);
 
         let isMoved = false;
         puzzle.addEventListener('click', (e) => {
