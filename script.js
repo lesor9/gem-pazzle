@@ -22,9 +22,11 @@ function selecteChanged() {
     let sel = select.selectedIndex + 3;
     stepNumber.innerHTML = 0;
     document.body.removeChild(document.querySelector('.game-board'));
-    createField(sel);
+    makeChain(sel);
 }
 
+const stepsAndTime = document.createElement('div');
+stepsAndTime.classList.add('stepsAndTime');
 
 const steps = document.createElement('div');
 steps.classList.add('steps');
@@ -32,24 +34,30 @@ steps.innerHTML = "Ходов: ";
 stepNumber = document.createElement('span');
 stepNumber.innerHTML = 0;
 steps.appendChild(stepNumber);
-settings.appendChild(steps);
+stepsAndTime.appendChild(steps);
+
+const time = document.createElement('div');
+let sec = 0,
+    min = 0;
+time.innerHTML = `Прошло времени: ${sec}s`;
+setInterval(() => {
+    sec++;
+    if (sec >= 60) {
+        min++;
+        sec = sec - 60;
+    }
+
+    time.innerHTML = min ? `Прошло времени: ${min}m ${sec}s`: `Прошло времени: ${sec}s`;
+}, 1000);
+stepsAndTime.appendChild(time);
+
+settings.appendChild(stepsAndTime);
 
 document.body.appendChild(document.createElement('hr')).classList.add('line');
 
-
-
-createField();
-function createField (N = 3) {
+makeChain ();
+function makeChain (N = 4) {
     numberOfAllPazzles = N * N;
-
-    document.documentElement.style.setProperty('--pazzleSize', `${( 420 - (5 * (N - 1) ) ) / N}px`);
-    document.documentElement.style.setProperty('--pazzleMove', `${( ( 420 - (5 * (N - 1) ) ) / N ) + 5}px`); 
-    document.documentElement.style.setProperty('--pazzleMoveMinus', `${-( ( ( 420 - (5 * (N - 1) ) ) / N ) + 5 )}px`); 
-
-    let mainField = document.createElement('div');
-    mainField.style.cssText = `grid-template-columns: repeat(${N}, 1fr); grid-auto-rows: ${420 / N}px;`;
-    mainField.classList.add("game-board");
-    document.body.appendChild(mainField);
 
     let emptyCell = Math.floor(Math.random() * numberOfAllPazzles) + 1;
     console.log(`Пустая: ${emptyCell}`);
@@ -60,6 +68,27 @@ function createField (N = 3) {
     }
     
     const arrayElems = [...myNewSet];
+
+    if( (isSolveable(arrayElems.valueOf(), emptyCell)) ) {
+        createField(emptyCell, arrayElems, N);
+        return;
+    }
+    
+    makeChain(N);
+}
+
+
+
+function createField (emptyCell, arrayElems, N) {
+    document.documentElement.style.setProperty('--pazzleSize', `${( 420 - (5 * (N - 1) ) ) / N}px`);
+    document.documentElement.style.setProperty('--pazzleMove', `${( ( 420 - (5 * (N - 1) ) ) / N ) + 5}px`); 
+    document.documentElement.style.setProperty('--pazzleMoveMinus', `${-( ( ( 420 - (5 * (N - 1) ) ) / N ) + 5 )}px`); 
+
+    let mainField = document.createElement('div');
+    mainField.style.cssText = `grid-template-columns: repeat(${N}, 1fr); grid-auto-rows: ${420 / N}px;`;
+    mainField.classList.add("game-board");
+    document.body.appendChild(mainField);  
+    
 
     for (let i = 1; i <= numberOfAllPazzles; i++) {
 
@@ -252,6 +281,51 @@ function isFinished(N) {
     }
 
     if (isFinish) {
-        alert("Вы прошли!!!!");
+        alert(`Ура! Вы решили головоломку за ${min ? `${min}m ${sec}s`: `${sec}s`} и ${stepNumber.innerHTML} ходов`);
     }
 };
+
+function isSolveable (array, empt) {
+    const copyOfInitialArray = [];
+    for (let i = 0; i < array.length; i++) {
+        copyOfInitialArray.push(array[i]);
+    }
+
+    if (empt - 1 !== copyOfInitialArray.length) {
+        let k = copyOfInitialArray[empt - 1];
+        copyOfInitialArray[empt - 1] = 0;
+        copyOfInitialArray.push(k);
+    } else copyOfInitialArray.push(0);
+
+    let inversions = 0;
+    for (let i = 0; i < copyOfInitialArray.length; i++) {
+        for  (let j = i + 1; j < copyOfInitialArray.length; j++) {
+            if ( (copyOfInitialArray[i] > copyOfInitialArray[j]) && (j > i) && copyOfInitialArray[j] != 0) {
+                inversions++;
+            }
+        }
+    }
+
+    const newArr = [];
+    let gridWidth = Math.sqrt(array.length);
+    for (let i = 0; i < array.length; i+=3) {
+        newArr.push(array.slice(i, i + 3));
+    }
+
+    let row = Math.floor(newArr.reverse().flat().indexOf(0) / gridWidth);
+    isRowEven = (row + 1) % 2 === 0;
+
+    if ( (gridWidth % 2) !== 0 && (inversions % 2) === 0 ) {
+        return true;
+    }
+
+    if ( (gridWidth % 2) === 0 && (inversions % 2) !== 0 && isRowEven) {
+        return true;
+    }
+
+    if ( (gridWidth % 2) === 0 && (inversions % 2) === 0 && !isRowEven) {
+        return true;
+    }
+
+    return false;
+}

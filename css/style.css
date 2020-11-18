@@ -75,3 +75,9 @@
 .select {
     border-bottom: 2px solid currentcolor; 
 }
+
+.stepsAndTime {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+}
