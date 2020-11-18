@@ -10,7 +10,6 @@
     position: relative;
     margin: auto;
     max-width: 420px;
-    grid-gap: 5px;
     background: #8ed790;
     padding: 2px;
     border: 1px solid #444;
@@ -30,8 +29,8 @@
     cursor: pointer;
     transition: .3s;
     position: relative;
-    left: 0;
-    top: 0;
+    left: 0px;
+    top: 0px;
     user-select: none;
 }
 
@@ -53,10 +52,6 @@
 
 .bottom {
     top: var(--pazzleMove);
-}
-
-.puzzle:hover {
-    background-color: #333;
 }
 
 .line {

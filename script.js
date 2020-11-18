@@ -70,7 +70,7 @@ settings.appendChild(stepsAndTime);
 document.body.appendChild(document.createElement('hr')).classList.add('line');
 
 makeChain ();
-async function makeChain (N = 3) {
+async function makeChain (N = 4) {
     isAnimation = true;
     numberOfAllPazzles = N * N;
 
@@ -113,13 +113,6 @@ async function createField (emptyCell, arrayElems, N) {
     for (let i = 1; i <= numberOfAllPazzles; i++) {
         const puzzle = document.createElement('div');
         mainField.appendChild(puzzle);
-        puzzle.style.setProperty('opacity', `0`); 
-        puzzle.style.setProperty('left', `100px`); 
-        puzzle.style.setProperty('top', `100px`); 
-        await new Promise(r => setTimeout(r, 100));
-        puzzle.style.removeProperty('opacity', `1`); 
-        puzzle.style.removeProperty('left', `0px`); 
-        puzzle.style.removeProperty('top', `0px`);
 
         if (i === emptyCell) continue;
 
@@ -150,7 +143,7 @@ async function createField (emptyCell, arrayElems, N) {
                 koefCol = 1;
                 break;
             default:
-                koefCol = 1 / indexInColumn;
+                koefCol = (indexInColumn - 1) / (N - 1);
                 break;
         }
 
@@ -163,19 +156,27 @@ async function createField (emptyCell, arrayElems, N) {
                 koefRow = 1;
                 break;
             default:
-                koefRow = 1 / indexInRow;
+                koefRow = (indexInRow - 1) / (N - 1);
                 break;
         }
 
         let fir = 100 * koefCol;
         let sec = 100 * koefRow;
 
-
-        
         puzzle.style.setProperty('background', `no-repeat url(./assets/images/${numOfImage}.jpg) ${fir}% ${sec}% / ${N * 100}%`);
 
+
+        puzzle.style.setProperty('opacity', `0`); 
+        puzzle.style.setProperty('left', `100px`); 
+        puzzle.style.setProperty('top', `100px`); 
+        await new Promise(r => setTimeout(r, 100));
+        puzzle.style.removeProperty('opacity'); 
+        puzzle.style.removeProperty('left'); 
+        puzzle.style.removeProperty('top');
+
+
         let isMoved = false;
-        puzzle.addEventListener('click', (e) => {
+        puzzle.addEventListener('click', () => {
             if (isMoved) {
                 isMoved = false;
                 return;
@@ -272,8 +273,6 @@ async function createField (emptyCell, arrayElems, N) {
             let X = event.clientX;
             let Y = event.clientY;
 
-            let copyOfNodeCSS = puzzle.style.cssText;
-
             document.addEventListener('mousemove', onMouseMove);
             function onMouseMove(event) {
                 moveAt(event.pageX, event.pageY);
@@ -283,9 +282,9 @@ async function createField (emptyCell, arrayElems, N) {
             function moveAt(pageX, pageY) {
                 event.preventDefault();
                 puzzle.classList.add("puzzle-drag");
-                puzzle.style.zIndex = 1000;
-                puzzle.style.left = pageX - X + 'px';
-                puzzle.style.top = pageY - Y + 'px';
+                puzzle.style.setProperty('z-index', '1000');
+                puzzle.style.setProperty('left', `${pageX - X}px`);
+                puzzle.style.setProperty('top', `${pageY - Y}px`);
             }
 
 
@@ -301,12 +300,15 @@ async function createField (emptyCell, arrayElems, N) {
                     temp = document.createElement('div');
                     mainField.insertBefore(temp, puzzle);
                     let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
-                    mainField.removeChild(temp);
                     puzzle.hidden = false;
-                    puzzle.style.cssText = copyOfNodeCSS;
+                    mainField.removeChild(temp);
+
+                    puzzle.style.removeProperty('zIndex');
+                    puzzle.style.removeProperty('left');
+                    puzzle.style.removeProperty('top');
 
                     if (elemBelow.innerHTML === "") {
-                        puzzle.click();
+                            puzzle.click(); 
                     }
                 }
             }
@@ -317,9 +319,8 @@ async function createField (emptyCell, arrayElems, N) {
 }
 
 
-
 function index(el) {
-    var children = el.parentNode.childNodes,
+    let children = el.parentNode.childNodes,
         i = 0;
     for (; i < children.length; i++) {
         if (children[i] == el) {
