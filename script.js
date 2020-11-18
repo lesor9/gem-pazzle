@@ -50,14 +50,18 @@ stepsAndTime.appendChild(steps);
 const time = document.createElement('div');
 let sec = 0,
     min = 0;
-setInterval(() => {
-    sec++;
-    if (sec >= 60) {
-        min++;
-        sec = sec - 60;
-    }
 
-    time.innerHTML = min ? `Прошло времени: ${min}m ${sec}s`: `Прошло времени: ${sec}s`;
+let isAnimation = true;
+setInterval(() => {
+    if (!isAnimation) {
+        sec++;
+        if (sec >= 60) {
+            min++;
+            sec = sec - 60;
+        }
+        time.innerHTML = min ? `Прошло времени: ${min}m ${sec}s`: `Прошло времени: ${sec}s`;
+    }
+    
 }, 1000);
 stepsAndTime.appendChild(time);
 
@@ -66,11 +70,11 @@ settings.appendChild(stepsAndTime);
 document.body.appendChild(document.createElement('hr')).classList.add('line');
 
 makeChain ();
-function makeChain (N = 4) {
+async function makeChain (N = 3) {
+    isAnimation = true;
     numberOfAllPazzles = N * N;
 
     let emptyCell = Math.floor(Math.random() * numberOfAllPazzles) + 1;
-    console.log(`Пустая: ${emptyCell}`);
 
     let myNewSet = new Set();
     while ([...myNewSet].length != numberOfAllPazzles - 1) {
@@ -79,20 +83,19 @@ function makeChain (N = 4) {
     
     const arrayElems = [...myNewSet];
 
-    console.log(isSolveable(arrayElems.valueOf(), emptyCell));
-
     if( (isSolveable(arrayElems.valueOf(), emptyCell)) ) {
         time.innerHTML = `Прошло времени: 0s`;
         sec = 0;
         min = 0;
-        createField(emptyCell, arrayElems, N);
+        await createField(emptyCell, arrayElems, N);
+        setTimeout(() => {
+            isAnimation = false;
+        }, 300);
         return;
     }
     
     makeChain(N);
 }
-
-
 
 async function createField (emptyCell, arrayElems, N) {
     document.documentElement.style.setProperty('--pazzleSize', `${( 420 - (5 * (N - 1) ) ) / N}px`);
@@ -105,6 +108,7 @@ async function createField (emptyCell, arrayElems, N) {
     mainField.classList.add("game-board");
     document.body.appendChild(mainField);  
     
+    numOfImage = Math.floor(Math.random() * (151 - 1)) + 1;
 
     for (let i = 1; i <= numberOfAllPazzles; i++) {
         const puzzle = document.createElement('div');
@@ -115,13 +119,60 @@ async function createField (emptyCell, arrayElems, N) {
         await new Promise(r => setTimeout(r, 100));
         puzzle.style.removeProperty('opacity', `1`); 
         puzzle.style.removeProperty('left', `0px`); 
-        puzzle.style.removeProperty('top', `0px`); 
+        puzzle.style.removeProperty('top', `0px`);
 
         if (i === emptyCell) continue;
 
         puzzle.innerHTML = arrayElems[i - 1];
         if (arrayElems[i - 1] === undefined) puzzle.innerHTML = arrayElems[emptyCell - 1];
         puzzle.classList.add("puzzle");
+
+        let puzzleNum = Number(puzzle.innerHTML);
+
+        let indexInRow = puzzleNum / N;
+        if (indexInRow !== Math.floor(indexInRow)) {
+            indexInRow = Math.floor(indexInRow) + 1;
+        }
+
+        let indexInColumn = puzzleNum % N;;
+        if (puzzleNum < N) {
+            indexInColumn = puzzleNum;
+        } else if (indexInColumn === 0) {
+            indexInColumn = N;
+        }
+
+        let koefCol;
+        switch (indexInColumn) {
+            case 1:
+                koefCol = 0;
+                break;
+            case N:
+                koefCol = 1;
+                break;
+            default:
+                koefCol = 1 / indexInColumn;
+                break;
+        }
+
+        let koefRow;
+        switch (indexInRow) {
+            case 1:
+                koefRow = 0;
+                break;
+            case N:
+                koefRow = 1;
+                break;
+            default:
+                koefRow = 1 / indexInRow;
+                break;
+        }
+
+        let fir = 100 * koefCol;
+        let sec = 100 * koefRow;
+
+
+        
+        puzzle.style.setProperty('background', `no-repeat url(.././assets/images/${numOfImage}.jpg) ${fir}% ${sec}% / ${N * 100}%`);
 
         let isMoved = false;
         puzzle.addEventListener('click', (e) => {
@@ -133,10 +184,7 @@ async function createField (emptyCell, arrayElems, N) {
             new Audio("./assets/sounds/click_on_puzzle.mp3").play();
             stepNumber.innerHTML = Number(stepNumber.innerHTML) + 1;
 
-            console.log(`Кликнул на ${puzzle.innerHTML}`);
-
             i = index(puzzle) + 1;
-            console.log(`Номер элемента: ${i}`);
 
             let rightElem;
             if ( (i) % N === 0) {
@@ -217,9 +265,7 @@ async function createField (emptyCell, arrayElems, N) {
 
             setTimeout(() => {
                 isFinished(numberOfAllPazzles);
-            }, 300);
-            
-            console.log('============');
+            }, 400);
         });
 
         puzzle.onmousedown = function(event) {
@@ -332,14 +378,14 @@ function isSolveable (array, empt) {
         }
     }
 
-    const newArr = [];
-    let gridWidth = Math.sqrt(array.length);
-    for (let i = 0; i < array.length; i+=3) {
-        newArr.push(array.slice(i, i + 3));
+    newArr = [];
+    let gridWidth = Math.sqrt(copyOfInitialArray.length);
+    for (let i = 0; i < copyOfInitialArray.length; i+=gridWidth) {
+        newArr.push(copyOfInitialArray.slice(i, i + gridWidth));
     }
 
-    let row = Math.floor(newArr.reverse().flat().indexOf(0) / gridWidth);
-    isRowEven = (row + 1) % 2 === 0;
+    let row = Math.floor(newArr.reverse().flat().indexOf(0) / gridWidth) + 1;
+    let isRowEven = row % 2 === 0;
 
     if ( (gridWidth % 2) !== 0 && (inversions % 2) === 0 ) {
         return true;
