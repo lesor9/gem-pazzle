@@ -25,6 +25,17 @@ function selecteChanged() {
     makeChain(sel);
 }
 
+const newGameBtn = document.createElement(`button`);
+newGameBtn.innerHTML = 'New Game';
+newGameBtn.classList.add('new-game');
+newGameBtn.addEventListener(`click`, () => {
+    let sel = select.selectedIndex + 3;
+    stepNumber.innerHTML = 0;
+    document.body.removeChild(document.querySelector('.game-board'));
+    makeChain(sel);
+});
+settings.appendChild(newGameBtn);
+
 const stepsAndTime = document.createElement('div');
 stepsAndTime.classList.add('stepsAndTime');
 
@@ -39,7 +50,6 @@ stepsAndTime.appendChild(steps);
 const time = document.createElement('div');
 let sec = 0,
     min = 0;
-time.innerHTML = `Прошло времени: ${sec}s`;
 setInterval(() => {
     sec++;
     if (sec >= 60) {
@@ -69,7 +79,12 @@ function makeChain (N = 4) {
     
     const arrayElems = [...myNewSet];
 
+    console.log(isSolveable(arrayElems.valueOf(), emptyCell));
+
     if( (isSolveable(arrayElems.valueOf(), emptyCell)) ) {
+        time.innerHTML = `Прошло времени: 0s`;
+        sec = 0;
+        min = 0;
         createField(emptyCell, arrayElems, N);
         return;
     }
@@ -79,21 +94,28 @@ function makeChain (N = 4) {
 
 
 
-function createField (emptyCell, arrayElems, N) {
+async function createField (emptyCell, arrayElems, N) {
     document.documentElement.style.setProperty('--pazzleSize', `${( 420 - (5 * (N - 1) ) ) / N}px`);
     document.documentElement.style.setProperty('--pazzleMove', `${( ( 420 - (5 * (N - 1) ) ) / N ) + 5}px`); 
     document.documentElement.style.setProperty('--pazzleMoveMinus', `${-( ( ( 420 - (5 * (N - 1) ) ) / N ) + 5 )}px`); 
+    document.documentElement.style.setProperty('--pazzleFont', `${( ( 420 - (5 * (N - 1) ) ) / N ) / 2}px`);
 
     let mainField = document.createElement('div');
-    mainField.style.cssText = `grid-template-columns: repeat(${N}, 1fr); grid-auto-rows: ${420 / N}px;`;
+    mainField.style.cssText = `grid-template-columns: repeat(${N}, 1fr); grid-template-rows: repeat(${N}, ${420/N}px);`;
     mainField.classList.add("game-board");
     document.body.appendChild(mainField);  
     
 
     for (let i = 1; i <= numberOfAllPazzles; i++) {
-
         const puzzle = document.createElement('div');
         mainField.appendChild(puzzle);
+        puzzle.style.setProperty('opacity', `0`); 
+        puzzle.style.setProperty('left', `100px`); 
+        puzzle.style.setProperty('top', `100px`); 
+        await new Promise(r => setTimeout(r, 100));
+        puzzle.style.removeProperty('opacity', `1`); 
+        puzzle.style.removeProperty('left', `0px`); 
+        puzzle.style.removeProperty('top', `0px`); 
 
         if (i === emptyCell) continue;
 
@@ -108,6 +130,7 @@ function createField (emptyCell, arrayElems, N) {
                 return;
             }
 
+            new Audio("./assets/sounds/click_on_puzzle.mp3").play();
             stepNumber.innerHTML = Number(stepNumber.innerHTML) + 1;
 
             console.log(`Кликнул на ${puzzle.innerHTML}`);
@@ -285,6 +308,9 @@ function isFinished(N) {
     }
 };
 
+
+
+//https://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html
 function isSolveable (array, empt) {
     const copyOfInitialArray = [];
     for (let i = 0; i < array.length; i++) {
@@ -329,3 +355,11 @@ function isSolveable (array, empt) {
 
     return false;
 }
+
+function sleep(milliseconds) {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+      currentDate = Date.now();
+    } while (currentDate - date < milliseconds);
+  }

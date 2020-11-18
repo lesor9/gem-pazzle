@@ -2,6 +2,7 @@
     --pazzleSize: 130px;
     --pazzleMove: 140px;
     --pazzleMoveMinus: -140px;
+    --pazzleFont: 60px;
 }
 
 .game-board {
@@ -23,7 +24,7 @@
     border-radius: 10%;
     align-self: center;
     justify-self: center;
-    font-size: 60px;
+    font-size: var(--pazzleFont);
     color: white;
     text-align: center;
     line-height: var(--pazzleSize);
@@ -70,6 +71,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    align-items: center;
 }
 
 .select {
@@ -80,4 +82,22 @@
     display: flex;
     flex-direction: column;
     text-align: right;
+}
+
+.new-game {
+    color:#ecf0f1; 
+    text-decoration: none;
+    border-radius:5px;
+    border:solid 1px #f8ebd7;
+    background:#0c5527;
+    text-align:center;
+    padding:16px 18px 14px;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+.new-game:hover {
+    background:#3ab366;
+    cursor: pointer;
 }
