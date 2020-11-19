@@ -1,15 +1,15 @@
 :root {
-    --pazzleSize: 130px;
-    --pazzleMove: 140px;
-    --pazzleMoveMinus: -140px;
-    --pazzleFont: 60px;
+    --pazzleSize: 0;
+    --pazzleMove: 0;
+    --pazzleMoveMinus: -0;
+    --pazzleFont: 0;
 }
 
 .game-board {
     display: grid;
     position: relative;
     margin: auto;
-    max-width: 420px;
+    width: 420px;
     background: #8ed790;
     padding: 2px;
     border: 1px solid #444;
@@ -56,10 +56,12 @@
 
 .line {
     width: 80%;
+    max-width: 800px;
 }
 
 .settings {
     width: 80%;
+    max-width: 800px;
     height: 100px;
     margin: 0 auto;
     display: flex;
@@ -85,13 +87,31 @@
     border:solid 1px #f8ebd7;
     background:#0c5527;
     text-align:center;
-    padding:16px 18px 14px;
+    padding:16px 18px 14px; 
     -webkit-transition: all 0.3s;
     -moz-transition: all 0.3s;
     transition: all 0.3s;
 }
 
+.volume {
+    cursor: pointer;
+}
+
 .new-game:hover {
     background:#3ab366;
     cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .game-board {
+        width: 300px;
+    }
+
+    .new-game {
+        height: 10px;
+        padding: 0;
+        width: 75px;
+        height: 40px;
+        font-size: 13px;
+    }
 }

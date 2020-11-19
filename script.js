@@ -25,6 +25,24 @@ function selecteChanged() {
     makeChain(sel);
 }
 
+let volume = true;
+const volumeBtn = document.createElement('div');
+volumeBtn.innerHTML =  '<i class="material-icons">volume_up</i>';
+volumeBtn.classList.add('volume');
+volumeBtn.addEventListener('click', () => {
+    if (volume) {
+        volumeBtn.innerHTML = '<i class="material-icons">volume_off</i>';
+        volume = false;
+    } else if (!volume) {
+        volumeBtn.innerHTML = '<i class="material-icons">volume_up</i>';
+        volume = true;
+    }
+    
+});
+
+settings.appendChild(volumeBtn);
+
+
 const newGameBtn = document.createElement(`button`);
 newGameBtn.innerHTML = 'New Game';
 newGameBtn.classList.add('new-game');
@@ -98,13 +116,25 @@ async function makeChain (N = 4) {
 }
 
 async function createField (emptyCell, arrayElems, N) {
-    document.documentElement.style.setProperty('--pazzleSize', `${( 420 - (5 * (N - 1) ) ) / N}px`);
-    document.documentElement.style.setProperty('--pazzleMove', `${( ( 420 - (5 * (N - 1) ) ) / N ) + 5}px`); 
-    document.documentElement.style.setProperty('--pazzleMoveMinus', `${-( ( ( 420 - (5 * (N - 1) ) ) / N ) + 5 )}px`); 
-    document.documentElement.style.setProperty('--pazzleFont', `${( ( 420 - (5 * (N - 1) ) ) / N ) / 2}px`);
-
     let mainField = document.createElement('div');
-    mainField.style.cssText = `grid-template-columns: repeat(${N}, 1fr); grid-template-rows: repeat(${N}, ${420/N}px);`;
+
+    if (document.documentElement.clientWidth < 600) {
+        puzzleAndFieldSizes (300, N, mainField);
+    } else {
+        puzzleAndFieldSizes (420, N, mainField);
+    }
+
+    
+
+    window.onresize = function(e) {
+        let width = e.srcElement.innerWidth;
+        if (width < 600) {
+            puzzleAndFieldSizes(300, N, mainField);
+        } else {
+            puzzleAndFieldSizes(420, N, mainField);
+        }
+    };
+
     mainField.classList.add("game-board");
     document.body.appendChild(mainField);  
     
@@ -181,8 +211,11 @@ async function createField (emptyCell, arrayElems, N) {
                 isMoved = false;
                 return;
             }
-
-            new Audio("./assets/sounds/click_on_puzzle.mp3").play();
+            
+            if (volume) {
+                new Audio("./assets/sounds/click_on_puzzle.mp3").play();
+            }
+            
             stepNumber.innerHTML = Number(stepNumber.innerHTML) + 1;
 
             i = index(puzzle) + 1;
@@ -308,7 +341,7 @@ async function createField (emptyCell, arrayElems, N) {
                     puzzle.style.removeProperty('top');
 
                     if (elemBelow.innerHTML === "") {
-                            puzzle.click(); 
+                        puzzle.click(); 
                     }
                 }
             }
@@ -409,4 +442,13 @@ function sleep(milliseconds) {
     do {
       currentDate = Date.now();
     } while (currentDate - date < milliseconds);
-  }
+}
+
+
+function puzzleAndFieldSizes (width, N, mainField) {
+    document.documentElement.style.setProperty('--pazzleSize', `${( width - (5 * (N - 1) ) ) / N}px`);
+    document.documentElement.style.setProperty('--pazzleMove', `${( ( width - (5 * (N - 1) ) ) / N ) + 4}px`); 
+    document.documentElement.style.setProperty('--pazzleMoveMinus', `${-( ( ( width - (5 * (N - 1) ) ) / N ) + 4)}px`); 
+    document.documentElement.style.setProperty('--pazzleFont', `${( ( width - (5 * (N - 1) ) ) / N ) / 2}px`);
+    mainField.style.cssText = `grid-template-columns: repeat(${N}, 1fr); grid-template-rows: repeat(${N}, ${width/N}px);`;
+}
