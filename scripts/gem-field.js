@@ -1,153 +1,119 @@
-document.body.appendChild(document.createElement('hr')).classList.add('line');
+import Settings from './settings.js';
+export { makechain, autoSolver, autoSolverMode };
 
-const settings = document.createElement('div');
-settings.classList.add('settings');
-document.body.appendChild(settings);
+var history;
 
-const select = document.createElement('select');
-select.classList.add('select');
-select.setAttribute('onchange', 'selecteChanged()');
-settings.appendChild(select);
+function shuffle(arr, N) {
+    const step = N;
+    const numOfAllPuzzles = Math.pow(N, 2);
+    const directions = ['up', 'right', 'down', 'left'];
+    const shuffleHistory = [];
+    let lastMove;
 
-for (let i = 3; i <= 8; i++) {
-    const option = document.createElement('option');
-    if (i === 4) {
-        option.setAttribute("selected", "selected");
-    } 
-    option.innerHTML = `${i}x${i}`;
-    select.appendChild(option);
-}
+    for (let i = 0; i < Math.pow(N, 3); i++) {
+        const indexOfBlank = arr.indexOf(0);
+        
+        const possibleMoves = {
+            up: true,
+            right: true,
+            down: true,
+            left: true,
+        };
 
-function selecteChanged() {
-    let sel = select.selectedIndex + 3;
-    stepNumber.innerHTML = 0;
-    document.body.removeChild(document.querySelector('.game-board'));
-    makeChain(sel);
-}
-
-let volume = true;
-const volumeBtn = document.createElement('div');
-volumeBtn.innerHTML =  '<i class="material-icons">volume_up</i>';
-volumeBtn.classList.add('volume');
-volumeBtn.addEventListener('click', () => {
-    if (volume) {
-        volumeBtn.innerHTML = '<i class="material-icons">volume_off</i>';
-        volume = false;
-    } else if (!volume) {
-        volumeBtn.innerHTML = '<i class="material-icons">volume_up</i>';
-        volume = true;
-    }
-    
-});
-
-settings.appendChild(volumeBtn);
-
-
-const newGameBtn = document.createElement(`button`);
-newGameBtn.innerHTML = 'New Game';
-newGameBtn.classList.add('new-game');
-newGameBtn.addEventListener(`click`, () => {
-    let sel = select.selectedIndex + 3;
-    stepNumber.innerHTML = 0;
-    document.body.removeChild(document.querySelector('.game-board'));
-    makeChain(sel);
-});
-settings.appendChild(newGameBtn);
-
-const stepsAndTime = document.createElement('div');
-stepsAndTime.classList.add('stepsAndTime');
-
-const steps = document.createElement('div');
-steps.classList.add('steps');
-steps.innerHTML = "Ходов: ";
-stepNumber = document.createElement('span');
-stepNumber.innerHTML = 0;
-steps.appendChild(stepNumber);
-stepsAndTime.appendChild(steps);
-
-const time = document.createElement('div');
-let sec = 0,
-    min = 0;
-
-let isAnimation = true;
-setInterval(() => {
-    if (!isAnimation) {
-        sec++;
-        if (sec >= 60) {
-            min++;
-            sec = sec - 60;
+        //check if elem is on top or bottom layer
+        if (indexOfBlank < N) {
+            possibleMoves.up = false;
+        } else if (indexOfBlank > numOfAllPuzzles - N) {
+            possibleMoves.down = false;
         }
-        time.innerHTML = min ? `Прошло времени: ${min}m ${sec}s`: `Прошло времени: ${sec}s`;
+
+        //check if elem is on left or right part
+        if (indexOfBlank === 0 || (indexOfBlank - 1) % N === 0) {
+            possibleMoves.left = false;
+        } else if ( (indexOfBlank + 1) % N === 0) {
+            possibleMoves.right = false;
+        }
+
+        if (lastMove) {
+            possibleMoves[lastMove] = false;
+        }
+
+        do {
+            var dir = directions[Math.floor(Math.random() * 4)];
+        } while (possibleMoves[dir] !== true);
+             
+
+        switch (dir) {
+            case 'up':
+                arr[indexOfBlank] = arr[indexOfBlank - step];
+                arr[indexOfBlank - step] = 0;
+                lastMove = 'down';
+                break;
+            case 'right':
+                arr[indexOfBlank] = arr[indexOfBlank + 1];
+                arr[indexOfBlank + 1] = 0;
+                lastMove = 'left';
+                break;
+            case 'down':
+                arr[indexOfBlank] = arr[indexOfBlank + step];
+                arr[indexOfBlank + step] = 0;
+                lastMove = 'up';
+                break;
+            case 'left':
+                arr[indexOfBlank] = arr[indexOfBlank - 1];
+                arr[indexOfBlank - 1] = 0;
+                lastMove = 'right';
+                break;
+        }
+
+        shuffleHistory.push(arr[indexOfBlank]);
     }
     
-}, 1000);
-stepsAndTime.appendChild(time);
-
-settings.appendChild(stepsAndTime);
-
-document.body.appendChild(document.createElement('hr')).classList.add('line');
-
-makeChain ();
-async function makeChain (N = 4) {
-    isAnimation = true;
-    numberOfAllPazzles = N * N;
-
-    let emptyCell = Math.floor(Math.random() * numberOfAllPazzles) + 1;
-
-    let myNewSet = new Set();
-    while ([...myNewSet].length != numberOfAllPazzles - 1) {
-        myNewSet.add(Math.floor(Math.random() * (numberOfAllPazzles - 1)) + 1);
-    }
-    
-    const arrayElems = [...myNewSet];
-
-    if( (isSolveable(arrayElems.valueOf(), emptyCell)) ) {
-        time.innerHTML = `Прошло времени: 0s`;
-        sec = 0;
-        min = 0;
-        await createField(emptyCell, arrayElems, N);
-        setTimeout(() => {
-            isAnimation = false;
-        }, 300);
-        return;
-    }
-    
-    makeChain(N);
+    return shuffleHistory;
 }
 
-async function createField (emptyCell, arrayElems, N) {
+async function makechain (N = 4) {
+    await createField(N);
+    setTimeout(() => {
+        Settings.properties.isAnimation = false;
+    }, 300);
+}
+
+async function createField (N) {
+    Settings.properties.solverMode = false;
+    Settings.properties.isAnimation = true;
+    Settings.properties.sec = 0;
+    Settings.properties.min = 0;
+    const time = document.querySelector('.time');
+    time.innerHTML = `Прошло времени: 0s`;
+
+    let numberOfAllPazzles = N * N;
+
+    const numsArr = [];
+    for (let i = 1; i < numberOfAllPazzles; i++) {
+        numsArr.push(i);
+    }
+    numsArr.push(0);
+    history = shuffle(numsArr, N);
+
     let mainField = document.createElement('div');
-
-    if (document.documentElement.clientWidth < 600) {
-        puzzleAndFieldSizes (300, N, mainField);
-    } else {
-        puzzleAndFieldSizes (420, N, mainField);
-    }
-
-    
-
-    window.onresize = function(e) {
-        let width = e.srcElement.innerWidth;
-        if (width < 600) {
-            puzzleAndFieldSizes(300, N, mainField);
-        } else {
-            puzzleAndFieldSizes(420, N, mainField);
-        }
-    };
-
     mainField.classList.add("game-board");
-    document.body.appendChild(mainField);  
-    
-    numOfImage = Math.floor(Math.random() * (151 - 1)) + 1;
+    document.body.appendChild(mainField); 
 
-    for (let i = 1; i <= numberOfAllPazzles; i++) {
+    adaptiveForField(mainField, N);
+    
+     
+    let numOfImage = Math.floor(Math.random() * (151 - 1)) + 1;
+
+    console.log(numsArr);
+
+    for (let i = 0; i < numberOfAllPazzles; i++) {
         const puzzle = document.createElement('div');
         mainField.appendChild(puzzle);
 
-        if (i === emptyCell) continue;
+        if (numsArr[i] === 0) continue;
 
-        puzzle.innerHTML = arrayElems[i - 1];
-        if (arrayElems[i - 1] === undefined) puzzle.innerHTML = arrayElems[emptyCell - 1];
+        puzzle.innerHTML = numsArr[i];
         puzzle.classList.add("puzzle");
 
         let puzzleNum = Number(puzzle.innerHTML);
@@ -212,10 +178,15 @@ async function createField (emptyCell, arrayElems, N) {
                 return;
             }
             
-            if (volume) {
+            if (!Settings.properties.solverMode) {
+                history.push(puzzleNum);
+            }
+
+            if (Settings.properties.volume) {
                 new Audio("./assets/sounds/click_on_puzzle.mp3").play();
             }
             
+            let stepNumber = document.querySelector('.step');
             stepNumber.innerHTML = Number(stepNumber.innerHTML) + 1;
 
             i = index(puzzle) + 1;
@@ -330,7 +301,7 @@ async function createField (emptyCell, arrayElems, N) {
 
                 if (isPuzzleMoved) {
                     puzzle.hidden = true;
-                    temp = document.createElement('div');
+                    let temp = document.createElement('div');
                     mainField.insertBefore(temp, puzzle);
                     let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
                     puzzle.hidden = false;
@@ -347,10 +318,42 @@ async function createField (emptyCell, arrayElems, N) {
             }
         }
 
+    
         
     }
 }
 
+function autoSolverMode () {
+    Settings.properties.solverMode = true;
+}
+
+function autoSolver () {
+    if (Settings.properties.isAnimation) return; 
+    let mainField = document.querySelector('.game-board');
+    let numberOfAllPazzles = mainField.children.length;
+    let solverBtn = document.querySelector('.solver');
+    solverBtn.disabled = true;
+    
+    for (let j = 0; j < numberOfAllPazzles; j++) {
+        if (mainField.children[j].innerHTML == history[history.length - 1]) {
+            history.pop();
+            mainField.children[j].click();
+            break;
+        }
+    }
+
+    solverBtn.innerHTML = history.length;
+    
+    console.log(Settings.properties.solverMode);
+
+    if (history.length != 0 && Settings.properties.solverMode === true) {
+        setTimeout(autoSolver, 300);
+    } else {
+        solverBtn.innerHTML = 'Auto Solver';
+        Settings.properties.solverMode = false;
+        solverBtn.disabled = false;
+    }
+}
 
 function index(el) {
     let children = el.parentNode.childNodes,
@@ -384,57 +387,10 @@ function isFinished(N) {
     }
 
     if (isFinish) {
-        alert(`Ура! Вы решили головоломку за ${min ? `${min}m ${sec}s`: `${sec}s`} и ${stepNumber.innerHTML} ходов`);
+        let stepNumber = document.querySelector('.step');
+        alert(`Ура! Вы решили головоломку за ${Settings.properties.min ? `${Settings.properties.min}m ${Settings.properties.sec}s`: `${Settings.properties.sec}s`} и ${stepNumber.innerHTML} ходов`);
     }
 };
-
-
-
-//https://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html
-function isSolveable (array, empt) {
-    const copyOfInitialArray = [];
-    for (let i = 0; i < array.length; i++) {
-        copyOfInitialArray.push(array[i]);
-    }
-
-    if (empt - 1 !== copyOfInitialArray.length) {
-        let k = copyOfInitialArray[empt - 1];
-        copyOfInitialArray[empt - 1] = 0;
-        copyOfInitialArray.push(k);
-    } else copyOfInitialArray.push(0);
-
-    let inversions = 0;
-    for (let i = 0; i < copyOfInitialArray.length; i++) {
-        for  (let j = i + 1; j < copyOfInitialArray.length; j++) {
-            if ( (copyOfInitialArray[i] > copyOfInitialArray[j]) && (j > i) && copyOfInitialArray[j] != 0) {
-                inversions++;
-            }
-        }
-    }
-
-    newArr = [];
-    let gridWidth = Math.sqrt(copyOfInitialArray.length);
-    for (let i = 0; i < copyOfInitialArray.length; i+=gridWidth) {
-        newArr.push(copyOfInitialArray.slice(i, i + gridWidth));
-    }
-
-    let row = Math.floor(newArr.reverse().flat().indexOf(0) / gridWidth) + 1;
-    let isRowEven = row % 2 === 0;
-
-    if ( (gridWidth % 2) !== 0 && (inversions % 2) === 0 ) {
-        return true;
-    }
-
-    if ( (gridWidth % 2) === 0 && (inversions % 2) !== 0 && isRowEven) {
-        return true;
-    }
-
-    if ( (gridWidth % 2) === 0 && (inversions % 2) === 0 && !isRowEven) {
-        return true;
-    }
-
-    return false;
-}
 
 function sleep(milliseconds) {
     const date = Date.now();
@@ -451,4 +407,21 @@ function puzzleAndFieldSizes (width, N, mainField) {
     document.documentElement.style.setProperty('--pazzleMoveMinus', `${-( ( ( width - (5 * (N - 1) ) ) / N ) + 4)}px`); 
     document.documentElement.style.setProperty('--pazzleFont', `${( ( width - (5 * (N - 1) ) ) / N ) / 2}px`);
     mainField.style.cssText = `grid-template-columns: repeat(${N}, 1fr); grid-template-rows: repeat(${N}, ${width/N}px);`;
+}
+
+function adaptiveForField (mainField, N) {
+    if (document.documentElement.clientWidth < 600) {
+        puzzleAndFieldSizes (300, N, mainField);
+    } else {
+        puzzleAndFieldSizes (420, N, mainField);
+    }
+
+    window.onresize = function(e) {
+        let width = e.srcElement.innerWidth;
+        if (width < 600) {
+            puzzleAndFieldSizes(300, N, mainField);
+        } else {
+            puzzleAndFieldSizes(420, N, mainField);
+        }
+    };
 }

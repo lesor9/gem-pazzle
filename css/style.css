@@ -80,7 +80,7 @@
     text-align: right;
 }
 
-.new-game {
+.button {
     color:#ecf0f1; 
     text-decoration: none;
     border-radius:5px;
@@ -91,23 +91,26 @@
     -webkit-transition: all 0.3s;
     -moz-transition: all 0.3s;
     transition: all 0.3s;
+    width: 107px;
+    height: 48px;
+}
+
+.button:hover {
+    background:#3ab366;
+    cursor: pointer;
 }
 
 .volume {
     cursor: pointer;
 }
 
-.new-game:hover {
-    background:#3ab366;
-    cursor: pointer;
-}
 
 @media (max-width: 600px) {
     .game-board {
         width: 300px;
     }
 
-    .new-game {
+    .button {
         height: 10px;
         padding: 0;
         width: 75px;
