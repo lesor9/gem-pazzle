@@ -1,5 +1,5 @@
 import Settings from './settings.js';
-export { makechain, autoSolver, autoSolverMode };
+export { makechain, autoSolver, autoSolverMode, bestResult };
 
 var history;
 
@@ -85,7 +85,7 @@ async function createField (N) {
     Settings.properties.sec = 0;
     Settings.properties.min = 0;
     const time = document.querySelector('.time');
-    time.innerHTML = `Прошло времени: 0s`;
+    time.innerHTML = `0s`;
 
     let numberOfAllPazzles = N * N;
 
@@ -104,8 +104,6 @@ async function createField (N) {
     
      
     let numOfImage = Math.floor(Math.random() * (151 - 1)) + 1;
-
-    console.log(numsArr);
 
     for (let i = 0; i < numberOfAllPazzles; i++) {
         const puzzle = document.createElement('div');
@@ -268,9 +266,11 @@ async function createField (N) {
                 }  
             }
 
-            setTimeout(() => {
-                isFinished(numberOfAllPazzles);
-            }, 400);
+            if (!Settings.properties.solverMode) {
+                setTimeout(() => {
+                    isFinished(numberOfAllPazzles, numOfImage);
+                }, 400);
+            }
         });
 
         puzzle.onmousedown = function(event) {
@@ -344,7 +344,6 @@ function autoSolver () {
 
     solverBtn.innerHTML = history.length;
     
-    console.log(Settings.properties.solverMode);
 
     if (history.length != 0 && Settings.properties.solverMode === true) {
         setTimeout(autoSolver, 300);
@@ -366,8 +365,9 @@ function index(el) {
     return -1;
 }
 
-function isFinished(N) {
+function isFinished(N, numOfImage) {
     let field = document.querySelector(`.game-board`).children;
+    let stepNumber = document.querySelector('.step');
     const elems = [],
           finishedArr = [];
 
@@ -382,14 +382,68 @@ function isFinished(N) {
     for (let i = 0; i < N; i++) {
         if (elems[i] !== finishedArr[i]) {
             isFinish = false;
-            break;
+            return;
         }
     }
 
-    if (isFinish) {
-        let stepNumber = document.querySelector('.step');
-        alert(`Ура! Вы решили головоломку за ${Settings.properties.min ? `${Settings.properties.min}m ${Settings.properties.sec}s`: `${Settings.properties.sec}s`} и ${stepNumber.innerHTML} ходов`);
+    const tableName = document.createElement('caption');
+    tableName.classList.add('result-table__table-name');
+    let options = document.querySelector('.select').options;
+    let sel = document.querySelector('.select').selectedIndex;
+
+    let recrd = localStorage.getItem('recrd');
+    
+    console.log(recrd);
+    if (recrd === null) {
+        recrd = {};
+    } else {
+        recrd = JSON.parse(recrd);
     }
+    
+    let arr = recrd[options[sel].value];
+    
+    if (arr === undefined) {
+        arr = [[]];
+        arr[0].push(Settings.properties.min);
+        arr[0].push(Settings.properties.sec);
+        arr[0].push(numOfImage);
+    } else {
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i][0] >= Settings.properties.min) {
+                if (arr[i][1] >= Settings.properties.sec) {
+                    console.log('last1');
+                    const temp = [];
+                    temp.push(Settings.properties.min);
+                    temp.push(Settings.properties.sec);
+                    temp.push(numOfImage);
+                    arr.splice(i, 0, temp);
+                    break;
+                }
+            }
+
+            if (i === arr.length - 1) {
+                console.log('last2');
+                const temp = [];
+                temp.push(Settings.properties.min);
+                temp.push(Settings.properties.sec);
+                temp.push(numOfImage);
+                arr.push(temp);
+                break;
+            }
+        }
+
+        while (arr.length > 10) {
+            arr.pop();
+        }
+    }
+
+    console.log(recrd);
+    recrd[options[sel].value] = arr;
+    console.log(arr);
+    localStorage.setItem('recrd', JSON.stringify(recrd));
+
+    alert(`Ура! Вы решили головоломку за ${Settings.properties.min ? `${Settings.properties.min}m ${Settings.properties.sec}s`: `${Settings.properties.sec}s`} и ${stepNumber.innerHTML} ходов`);
+    
 };
 
 function sleep(milliseconds) {
@@ -424,4 +478,112 @@ function adaptiveForField (mainField, N) {
             puzzleAndFieldSizes(420, N, mainField);
         }
     };
+}
+
+function bestResult () {
+    const overlay = document.createElement('div');
+    overlay.classList.add('overlay');
+
+    overlay.addEventListener('click', (e) => {
+        if (e.path[0].classList[0] === 'overlay') {
+            document.body.removeChild(overlay);
+        }
+    });
+
+    const resultTable = document.createElement('div');
+    resultTable.classList.add('result-table');
+    overlay.appendChild(resultTable);
+
+    const resultTableContent = document.createElement('div');
+    resultTableContent.classList.add('result-table-content');
+    resultTable.appendChild(resultTableContent);
+
+   
+    const table = createTable();
+
+    resultTableContent.appendChild(table);
+
+    const img = document.createElement('img');
+    img.src = './assets/images/close-button.png';
+    img.alt = 'img';
+    img.classList.add('result-table__close-img');
+    resultTable.appendChild(img);
+
+    document.body.appendChild(overlay);
+}
+
+function createTable () {
+    const table = document.createElement('table');
+    table.classList.add('result-table__table');
+
+    let recrd = localStorage.getItem('recrd');
+    
+    const options = document.querySelector('.select').options;
+    const sel = document.querySelector('.select').selectedIndex;
+
+    if (recrd === null) {
+        table.innerHTML += `Покуда нет рекордов:)`;
+        return table;
+    } else {
+        recrd = JSON.parse(recrd);
+    }
+
+
+    
+    let arr = recrd[options[sel].value];
+
+    if (arr === undefined) {
+        table.innerHTML += `Покуда нет рекордов:)`;
+        return table;
+    }
+
+    //table caption
+    const tableName = document.createElement('caption');
+    tableName.classList.add('result-table__table-name');
+    tableName.innerHTML = '10 лучших результатов для поля ' + options[sel].text ;
+    table.appendChild(tableName);
+    
+
+    //table head
+    const head = document.createElement('thead');
+    const trHead = document.createElement('tr');
+
+    const th1 = document.createElement('th');
+    th1.innerHTML = '№';
+    const th2 = document.createElement('th');
+    th2.innerHTML = 'Время';
+    const th3 = document.createElement('th');
+    th3.innerHTML = 'Изображение';
+
+    trHead.appendChild(th1);
+    trHead.appendChild(th2);
+    trHead.appendChild(th3);
+
+    head.appendChild(trHead);
+    table.appendChild(head);
+
+    //table body
+    const body = document.createElement('tbody');
+    for (let i = 0; i <= arr.length; i++) {
+        if (arr[i] === undefined) break;
+
+        const tr = document.createElement('tr');
+
+        const tdNumber = document.createElement('td');
+        const tdTime = document.createElement('td');
+        const tdImg = document.createElement('td');
+
+        tdNumber.innerHTML = i + 1;
+        tdTime.innerHTML = `${arr[i][0] ? `${arr[i][0]}m ${arr[i][1]}s`: `${arr[i][1]}s`}`;
+        tdImg.innerHTML = `<img src="./assets/images/${arr[i][2]}.jpg" alt="img"></img>`;
+
+        tr.appendChild(tdNumber);
+        tr.appendChild(tdTime);
+        tr.appendChild(tdImg);
+
+        body.appendChild(tr);
+    }
+    table.appendChild(body);
+
+    return table;
 }

@@ -61,7 +61,7 @@
 
 .settings {
     width: 80%;
-    max-width: 800px;
+    max-width: 700px;
     height: 100px;
     margin: 0 auto;
     display: flex;
@@ -102,6 +102,71 @@
 
 .volume {
     cursor: pointer;
+}
+
+.sel-vol {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+}
+
+.overlay {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1001;
+    cursor: pointer;
+}
+
+.result-table {
+    height: 600px;
+    width: 60%;
+    background: white;
+    border-radius: 3%;
+    overflow-y: scroll;
+    cursor: default;
+}
+
+.result-table-content {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.result-table__table-name {
+    font-size: 20px;
+    font-weight: bold;
+    padding-bottom: 30px;
+}
+
+.result-table__table {
+    width: 80%;
+    text-align: center;
+}
+
+.result-table__close-img {
+    position: absolute;
+    right: -50px;
+}
+
+th, td {
+    padding: 5px 20px;
+}
+
+td img {
+    height: 100px;
+    width: 100px;
 }
 
 

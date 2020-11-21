@@ -1,4 +1,4 @@
-import { makechain, autoSolver, autoSolverMode } from './gem-field.js';
+import { makechain, autoSolver, autoSolverMode, bestResult } from './gem-field.js';
 
 const Settings = {
     init () {
@@ -6,8 +6,9 @@ const Settings = {
         this._createMainDiv();
         this._createSelectMenu();
         this._createVolumeBtn();
-        this._createNewGameBtn();
         this._autoSolverBtn();
+        this._createNewGameBtn();
+        this._bestResults();
         this._createStepsAndTime();
         this._createHr();
     },
@@ -22,6 +23,7 @@ const Settings = {
     },
 
     settingsField : document.createElement('div'),
+    selectAndVolumeField: document.createElement('div'),
 
     _createHr() {
         document.body.appendChild(document.createElement('hr')).classList.add('line');
@@ -36,7 +38,7 @@ const Settings = {
         const select = document.createElement('select');
         select.classList.add('select');
         select.addEventListener('change', this.selecteChanged);
-        this.settingsField.appendChild(select);
+        this.selectAndVolumeField.appendChild(select);
 
         for (let i = 3; i <= 8; i++) {
             const option = document.createElement('option');
@@ -51,8 +53,6 @@ const Settings = {
     selecteChanged() {
         let sel = this.selectedIndex + 3;
         Settings.properties.stepNumber.innerHTML = 0;
-
-        console.log(sel);
 
         document.body.removeChild(document.querySelector('.game-board'));
         makechain(sel);
@@ -73,7 +73,9 @@ const Settings = {
             
         });
 
-        this.settingsField.appendChild(volumeBtn);
+        this.selectAndVolumeField.appendChild(volumeBtn);
+        this.selectAndVolumeField.classList.add('sel-vol');
+        this.settingsField.appendChild(this.selectAndVolumeField);
     },
 
     _createNewGameBtn() {
@@ -84,7 +86,6 @@ const Settings = {
         newGameBtn.classList.add('button');
         newGameBtn.addEventListener(`click`, () => {
             let sel = select.selectedIndex + 3;
-            console.log(this.properties.stepNumber);
             this.properties.stepNumber.innerHTML = 0;
             document.body.removeChild(document.querySelector('.game-board'));
             makechain(sel);
@@ -105,6 +106,15 @@ const Settings = {
         this.settingsField.appendChild(autoSolverBtn);
     },
 
+    _bestResults() {
+        const resultsBtn = document.createElement('button');
+        resultsBtn.innerHTML = 'Best';
+        resultsBtn.classList.add('button');
+        resultsBtn.addEventListener('click', bestResult);
+        
+        this.settingsField.appendChild(resultsBtn);
+    },
+
     _createStepsAndTime() {
         const stepsAndTime = document.createElement('div');
         stepsAndTime.classList.add('stepsAndTime');
@@ -119,7 +129,7 @@ const Settings = {
         
         const time = document.createElement('div');
         time.classList.add('time');
-        time.innerHTML = this.properties.min ? `Прошло времени: ${this.properties.min}m ${this.properties.sec}s`: `Прошло времени: ${this.properties.sec}s`;
+        time.innerHTML = this.properties.min ? `${this.properties.min}m ${this.properties.sec}s`: `${this.properties.sec}s`;
         
         setInterval(() => {
             if (!this.properties.isAnimation) {
@@ -130,7 +140,7 @@ const Settings = {
                 }
             }
             
-            time.innerHTML = this.properties.min ? `Прошло времени: ${this.properties.min}m ${this.properties.sec}s`: `Прошло времени: ${this.properties.sec}s`;
+            time.innerHTML = this.properties.min ? `${this.properties.min}m ${this.properties.sec}s`: `${this.properties.sec}s`;
         }, 1000);
         stepsAndTime.appendChild(time);
 
