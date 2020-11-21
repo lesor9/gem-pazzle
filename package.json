@@ -1,0 +1,31 @@
+{
+  "name": "gem-pazzle",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint ./scripts",
+    "lint:fix": "eslint ./scripts --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lesor9/gem-pazzle.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lesor9/gem-pazzle/issues"
+  },
+  "homepage": "https://github.com/lesor9/gem-pazzle#readme",
+  "devDependencies": {
+    "eslint": "^7.14.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-html": "^6.1.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "prettier": "^2.2.0"
+  }
+}
