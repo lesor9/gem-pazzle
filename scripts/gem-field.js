@@ -85,7 +85,6 @@ async function createField (N) {
     const time = document.querySelector('.time');
     
     if (Settings.properties.saveMode) {
-        console.log('sadsa');
         Settings.properties.min = Settings.properties.game[4];
         Settings.properties.sec = Settings.properties.game[5];
     } else {
@@ -96,7 +95,7 @@ async function createField (N) {
 
     let numberOfAllPazzles = N * N;
 
-    if (Settings.properties.saveMode) numberOfAllPazzles = Math.pow(Settings.properties.game[0], 2)
+    if (Settings.properties.saveMode) numberOfAllPazzles = Math.pow(Settings.properties.game[0], 2);
 
     let numsArr = [];
     for (let i = 1; i < numberOfAllPazzles; i++) {
@@ -120,6 +119,9 @@ async function createField (N) {
         numOfImage = Settings.properties.game[6];
         let stepNumber = document.querySelector('.step');
         stepNumber.innerHTML = Settings.properties.game[3];
+
+        const time = document.querySelector('.time');
+        time.innerHTML = Settings.properties.min ? `${Settings.properties.min}m ${Settings.properties.sec}s`: `${Settings.properties.sec}s`;
     }
 
     for (let i = 0; i < numberOfAllPazzles; i++) {
@@ -411,7 +413,7 @@ function isFinished(N, numOfImage) {
 
     let recrd = localStorage.getItem('recrd');
     
-    console.log(recrd);
+
     if (recrd === null) {
         recrd = {};
     } else {
@@ -429,7 +431,6 @@ function isFinished(N, numOfImage) {
         for (let i = 0; i < arr.length; i++) {
             if (arr[i][0] >= Settings.properties.min) {
                 if (arr[i][1] >= Settings.properties.sec) {
-                    console.log('last1');
                     const temp = [];
                     temp.push(Settings.properties.min);
                     temp.push(Settings.properties.sec);
@@ -440,7 +441,6 @@ function isFinished(N, numOfImage) {
             }
 
             if (i === arr.length - 1) {
-                console.log('last2');
                 const temp = [];
                 temp.push(Settings.properties.min);
                 temp.push(Settings.properties.sec);
@@ -455,9 +455,7 @@ function isFinished(N, numOfImage) {
         }
     }
 
-    console.log(recrd);
     recrd[options[sel].value] = arr;
-    console.log(arr);
     localStorage.setItem('recrd', JSON.stringify(recrd));
 
     alert(`Ура! Вы решили головоломку за ${Settings.properties.min ? `${Settings.properties.min}m ${Settings.properties.sec}s`: `${Settings.properties.sec}s`} и ${stepNumber.innerHTML} ходов`);
@@ -624,8 +622,6 @@ function savedGame () {
     finalSave.push(Settings.properties.min);
     finalSave.push(Settings.properties.sec);
     finalSave.push(Settings.properties.num);   
-
-    console.log(finalSave);
 
     localStorage.setItem('savv', JSON.stringify(finalSave));
 }
