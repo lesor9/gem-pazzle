@@ -240,10 +240,12 @@ async function createField (N) {
             if (rightElem !== null) {
                 if (rightElem.innerHTML === "") { 
                     puzzle.classList.toggle("right");
+                    puzzle.style.pointerEvents = "none";
                     setTimeout(() => {
                         mainField.removeChild(puzzle);
                         mainField.insertBefore(puzzle, mainField.children[i]);
                         puzzle.classList.toggle("right");
+                        puzzle.style.pointerEvents = "auto";
                     }, 300);
                 }  
             }
@@ -251,10 +253,12 @@ async function createField (N) {
             if (leftElem !== null) {
                 if (leftElem.innerHTML === "") { 
                     puzzle.classList.toggle("left");
+                    puzzle.style.pointerEvents = "none";
                     setTimeout(() => {
                         mainField.removeChild(puzzle);
                         mainField.insertBefore(puzzle, mainField.children[i - 2]);
                         puzzle.classList.toggle("left");
+                        puzzle.style.pointerEvents = "auto";
                     }, 300);
                 }  
             }
@@ -263,12 +267,14 @@ async function createField (N) {
             if (topElem !== null) {
                 if (topElem.innerHTML === "") { 
                     puzzle.classList.toggle("top");
+                    puzzle.style.pointerEvents = "none";
                     setTimeout(() => {
                         mainField.removeChild(puzzle);
                         mainField.insertBefore(puzzle, mainField.children[i - (N + 1)]);
                         mainField.removeChild(topElem);
                         mainField.insertBefore(topElem, mainField.children[i - 1]);
                         puzzle.classList.toggle("top");
+                        puzzle.style.pointerEvents = "auto";
                     }, 300);
                 }  
             }
@@ -276,12 +282,14 @@ async function createField (N) {
             if (bottomElem !== null) {
                 if (bottomElem.innerHTML === "") { 
                     puzzle.classList.toggle("bottom");
+                    puzzle.style.pointerEvents = "none";
                     setTimeout(() => {
                         mainField.removeChild(puzzle);
                         mainField.insertBefore(puzzle, mainField.children[i + (N - 1)]);
                         mainField.removeChild(bottomElem);
                         mainField.insertBefore(bottomElem, mainField.children[i - 1]);
                         puzzle.classList.toggle("bottom");
+                        puzzle.style.pointerEvents = "auto";
                     }, 300);
                 }  
             }
@@ -341,6 +349,8 @@ async function createField (N) {
     
         
     }
+
+    Settings.properties.saveMode = false;
 }
 
 function autoSolverMode () {
