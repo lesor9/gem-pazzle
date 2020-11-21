@@ -1,5 +1,5 @@
 import Settings from './settings.js';
-export { makechain, autoSolver, autoSolverMode, bestResult , savedGame , lastGame};
+export { makechain, autoSolver, bestResult , savedGame , lastGame};
 
 var history;
 
@@ -81,6 +81,10 @@ async function makechain (N = 4) {
 
 async function createField (N) {
     Settings.properties.solverMode = false;
+    Settings.properties.solverModeHardOff = true;
+    let solverBtn = document.querySelector('.solver');
+    solverBtn.innerHTML = 'Auto Solver';
+    solverBtn.disabled = false;
     Settings.properties.isAnimation = true;
     const time = document.querySelector('.time');
     
@@ -122,6 +126,11 @@ async function createField (N) {
 
         const time = document.querySelector('.time');
         time.innerHTML = Settings.properties.min ? `${Settings.properties.min}m ${Settings.properties.sec}s`: `${Settings.properties.sec}s`;
+
+        let options = document.querySelector('.select').options;
+        let sel = document.querySelector('.select').selectedIndex;
+        options[sel].removeAttribute('selected', 'selected');
+        options[N - 3].setAttribute('selected', 'selected');
     }
 
     for (let i = 0; i < numberOfAllPazzles; i++) {
@@ -351,17 +360,19 @@ async function createField (N) {
     }
 
     Settings.properties.saveMode = false;
+    Settings.properties.solverModeHardOff = false;
 }
 
-function autoSolverMode () {
-    Settings.properties.solverMode = true;
-}
 
 function autoSolver () {
     if (Settings.properties.isAnimation) return; 
+    let solverBtn = document.querySelector('.solver');
+
+    Settings.properties.solverMode = true;
+    
     let mainField = document.querySelector('.game-board');
     let numberOfAllPazzles = mainField.children.length;
-    let solverBtn = document.querySelector('.solver');
+    
     solverBtn.disabled = true;
     
     for (let j = 0; j < numberOfAllPazzles; j++) {
@@ -479,7 +490,6 @@ function sleep(milliseconds) {
       currentDate = Date.now();
     } while (currentDate - date < milliseconds);
 }
-
 
 function puzzleAndFieldSizes (width, N, mainField) {
     document.documentElement.style.setProperty('--pazzleSize', `${( width - (5 * (N - 1) ) ) / N}px`);
@@ -634,6 +644,7 @@ function savedGame () {
     finalSave.push(Settings.properties.num);   
 
     localStorage.setItem('savv', JSON.stringify(finalSave));
+    alert('Игра сохранена');
 }
 
 function lastGame () {

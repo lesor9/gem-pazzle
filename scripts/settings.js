@@ -1,4 +1,4 @@
-import { makechain, autoSolver, autoSolverMode, bestResult , savedGame , lastGame } from './gem-field.js';
+import { makechain, autoSolver, bestResult , savedGame , lastGame } from './gem-field.js';
 
 const Settings = {
     init () {
@@ -20,6 +20,7 @@ const Settings = {
         sec: 0,
         min: 0,
         solverMode: false,
+        solverModeHardOff: false, 
         stepNumber: document.createElement('span'),
         saveMode: false,
     },
@@ -102,7 +103,6 @@ const Settings = {
         autoSolverBtn.classList.add('button');
         autoSolverBtn.innerHTML = 'Auto Solver';
 
-        autoSolverBtn.addEventListener('click', autoSolverMode);
         autoSolverBtn.addEventListener('click', autoSolver);
 
         this.settingsField.appendChild(autoSolverBtn);

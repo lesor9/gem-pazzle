@@ -114,6 +114,7 @@
     transition: all 0.3s;
     width: 107px;
     height: 28px;
+    cursor: pointer;
 }
 
 .button:hover {
