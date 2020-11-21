@@ -1,4 +1,4 @@
-import { makechain, autoSolver, autoSolverMode, bestResult } from './gem-field.js';
+import { makechain, autoSolver, autoSolverMode, bestResult , savedGame , lastGame } from './gem-field.js';
 
 const Settings = {
     init () {
@@ -9,6 +9,7 @@ const Settings = {
         this._autoSolverBtn();
         this._createNewGameBtn();
         this._bestResults();
+        this._saveGame();
         this._createStepsAndTime();
         this._createHr();
     },
@@ -19,7 +20,8 @@ const Settings = {
         sec: 0,
         min: 0,
         solverMode: false,
-        stepNumber:  document.createElement('span'),
+        stepNumber: document.createElement('span'),
+        saveMode: false,
     },
 
     settingsField : document.createElement('div'),
@@ -113,6 +115,28 @@ const Settings = {
         resultsBtn.addEventListener('click', bestResult);
         
         this.settingsField.appendChild(resultsBtn);
+    },
+
+    _saveGame() {
+        const saveBtnss = document.createElement('div');
+        saveBtnss.classList.add('save-btns');
+
+        const saveBtn = document.createElement('button');
+        const game = localStorage.getItem('savv');
+        saveBtn.innerHTML = 'Save';
+        
+        saveBtn.classList.add('save-button');
+        saveBtn.addEventListener('click', savedGame);
+
+        const loadBtn = document.createElement('button');
+        loadBtn.classList.add('save-button');
+        loadBtn.innerHTML = 'Last game';
+        loadBtn.addEventListener('click', lastGame);
+
+
+        saveBtnss.appendChild(saveBtn);
+        saveBtnss.appendChild(loadBtn);
+        this.settingsField.appendChild(saveBtnss);
     },
 
     _createStepsAndTime() {

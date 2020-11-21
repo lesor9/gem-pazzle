@@ -86,13 +86,34 @@
     border-radius:5px;
     border:solid 1px #f8ebd7;
     background:#0c5527;
-    text-align:center;
-    padding:16px 18px 14px; 
     -webkit-transition: all 0.3s;
     -moz-transition: all 0.3s;
     transition: all 0.3s;
     width: 107px;
     height: 48px;
+    padding: 16px 18px 14px; 
+    text-align: center;
+}
+
+.save-btns {
+    width: 107px;
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+}
+
+.save-button {
+    color:#ecf0f1; 
+    text-decoration: none;
+    border-radius:5px;
+    border:solid 1px #f8ebd7;
+    background:#0c5527;
+    text-align: center; 
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+    width: 107px;
+    height: 28px;
 }
 
 .button:hover {
@@ -130,11 +151,13 @@
 
 .result-table {
     height: 600px;
+    max-width: 600px;
     width: 60%;
     background: white;
     border-radius: 3%;
     overflow-y: scroll;
     cursor: default;
+    position: relative;
 }
 
 .result-table-content {
@@ -153,11 +176,6 @@
 .result-table__table {
     width: 80%;
     text-align: center;
-}
-
-.result-table__close-img {
-    position: absolute;
-    right: -50px;
 }
 
 th, td {

@@ -1,5 +1,5 @@
 import Settings from './settings.js';
-export { makechain, autoSolver, autoSolverMode, bestResult };
+export { makechain, autoSolver, autoSolverMode, bestResult , savedGame , lastGame};
 
 var history;
 
@@ -82,14 +82,23 @@ async function makechain (N = 4) {
 async function createField (N) {
     Settings.properties.solverMode = false;
     Settings.properties.isAnimation = true;
-    Settings.properties.sec = 0;
-    Settings.properties.min = 0;
     const time = document.querySelector('.time');
-    time.innerHTML = `0s`;
+    
+    if (Settings.properties.saveMode) {
+        console.log('sadsa');
+        Settings.properties.min = Settings.properties.game[4];
+        Settings.properties.sec = Settings.properties.game[5];
+    } else {
+        Settings.properties.sec = 0;
+        Settings.properties.min = 0;
+        time.innerHTML = `0s`;
+    }
 
     let numberOfAllPazzles = N * N;
 
-    const numsArr = [];
+    if (Settings.properties.saveMode) numberOfAllPazzles = Math.pow(Settings.properties.game[0], 2)
+
+    let numsArr = [];
     for (let i = 1; i < numberOfAllPazzles; i++) {
         numsArr.push(i);
     }
@@ -105,11 +114,19 @@ async function createField (N) {
      
     let numOfImage = Math.floor(Math.random() * (151 - 1)) + 1;
 
+    if (Settings.properties.saveMode) {
+        numsArr = Settings.properties.game[1];
+        history = Settings.properties.game[2];
+        numOfImage = Settings.properties.game[6];
+        let stepNumber = document.querySelector('.step');
+        stepNumber.innerHTML = Settings.properties.game[3];
+    }
+
     for (let i = 0; i < numberOfAllPazzles; i++) {
         const puzzle = document.createElement('div');
         mainField.appendChild(puzzle);
 
-        if (numsArr[i] === 0) continue;
+        if (numsArr[i] == 0) continue;
 
         puzzle.innerHTML = numsArr[i];
         puzzle.classList.add("puzzle");
@@ -158,6 +175,7 @@ async function createField (N) {
         let sec = 100 * koefRow;
 
         puzzle.style.setProperty('background', `no-repeat url(./assets/images/${numOfImage}.jpg) ${fir}% ${sec}% / ${N * 100}%`);
+        Settings.properties.num = numOfImage;
 
 
         puzzle.style.setProperty('opacity', `0`); 
@@ -503,12 +521,6 @@ function bestResult () {
 
     resultTableContent.appendChild(table);
 
-    const img = document.createElement('img');
-    img.src = './assets/images/close-button.png';
-    img.alt = 'img';
-    img.classList.add('result-table__close-img');
-    resultTable.appendChild(img);
-
     document.body.appendChild(overlay);
 }
 
@@ -586,4 +598,53 @@ function createTable () {
     table.appendChild(body);
 
     return table;
+}
+
+function savedGame () {
+    if (Settings.properties.isAnimation) return; 
+
+    const field = document.querySelector('.game-board').children;
+    const arr = [];
+
+    for (let i = 0; i < field.length; i++) {
+        if (field[i].innerHTML == '') {
+            arr.push('0');
+        } else {
+            arr.push(field[i].innerHTML);
+        }
+    }
+
+    const step = Number(document.querySelector('.step').innerHTML);
+
+    const finalSave = [];
+    finalSave.push(Math.sqrt(arr.length));
+    finalSave.push(arr);
+    finalSave.push(history);
+    finalSave.push(step);
+    finalSave.push(Settings.properties.min);
+    finalSave.push(Settings.properties.sec);
+    finalSave.push(Settings.properties.num);   
+
+    console.log(finalSave);
+
+    localStorage.setItem('savv', JSON.stringify(finalSave));
+}
+
+function lastGame () {
+    if (Settings.properties.isAnimation) return; 
+    let game = localStorage.getItem('savv');
+    if (game === null) {
+        alert('Нету сохраненной игры');
+        return;
+    }
+    game = JSON.parse(game);
+
+    Settings.properties.game = game;
+
+    Settings.properties.saveMode = true;
+
+    const gameBoard = document.querySelector('.game-board');
+    document.body.removeChild(gameBoard);
+
+    makechain(game[0]);
 }
