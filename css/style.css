@@ -218,4 +218,12 @@ td img {
         width: 52px;
         height: 35px;
     }
+
+    .line {
+        width: 95%;
+    }
+    
+    .settings {
+        width: 95%;
+    }
 }
