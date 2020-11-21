@@ -182,4 +182,9 @@ td img {
         height: 40px;
         font-size: 13px;
     }
+
+    .result-table {
+        height: 400px;
+        width: 90%;
+    }
 }
