@@ -206,4 +206,16 @@ td img {
         height: 400px;
         width: 90%;
     }
+
+    .save-btns {
+        width: 52px;
+        height: 70px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .save-button {
+        width: 52px;
+        height: 35px;
+    }
 }

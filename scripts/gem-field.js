@@ -366,13 +366,13 @@ async function createField (N) {
 
 function autoSolver () {
     if (Settings.properties.isAnimation) return; 
+    const mainField = document.querySelector('.game-board');
     let solverBtn = document.querySelector('.solver');
 
     Settings.properties.solverMode = true;
     
-    let mainField = document.querySelector('.game-board');
     let numberOfAllPazzles = mainField.children.length;
-    
+
     solverBtn.disabled = true;
     
     for (let j = 0; j < numberOfAllPazzles; j++) {
