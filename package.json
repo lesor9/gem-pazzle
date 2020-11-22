@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint ./scripts",
-    "lint:fix": "eslint ./scripts --fix",
+    "lint": "eslint ./src/scripts",
+    "lint:fix": "eslint ./src/scripts --fix",
     "build": "webpack"
   },
   "repository": {

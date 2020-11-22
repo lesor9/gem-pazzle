@@ -1,5 +1,3 @@
-import '../css/style.css';
-
 import {
   makechain, autoSolver, bestResult, savedGame, lastGame,
 } from './gem-field.js';

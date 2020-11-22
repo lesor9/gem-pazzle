@@ -1,16 +1,16 @@
 import Settings from './settings.js';
-import sound from '../assets/sounds/click_on_puzzle.mp3';
-
-function importAll(r) {
-  return r.keys().map(r);
-}
-importAll(require.context('../assets/images/', false, /\.(png|jpe?g|svg)$/));
 
 let history;
 
-function shuffle(arr, N) {
-  const step = N;
+function shuffle(N) {
   const numOfAllPuzzles = N ** 2;
+  const arr = [];
+  for (let i = 1; i < numOfAllPuzzles; i += 1) {
+    arr.push(i);
+  }
+  arr.push(0);
+
+  const step = N;
   const directions = ['up', 'right', 'down', 'left'];
   const shuffleHistory = [];
   let lastMove;
@@ -76,7 +76,11 @@ function shuffle(arr, N) {
     shuffleHistory.push(arr[indexOfBlank]);
   }
 
-  return shuffleHistory;
+  const chainAndHistory = {};
+  chainAndHistory.chain = arr;
+  chainAndHistory.history = shuffleHistory;
+
+  return chainAndHistory;
 }
 
 function isFinished(N, numOfImage) {
@@ -197,28 +201,17 @@ async function createField(N) {
   Settings.properties.isAnimation = true;
   const time = document.querySelector('.time');
 
-  if (Settings.properties.saveMode) {
-    [, , , Settings.properties.min] = Settings.properties.game;
-    [, , , , Settings.properties.sec] = Settings.properties.game;
-    // Settings.properties.min = Settings.properties.game[4];
-    // Settings.properties.sec = Settings.properties.game[5];
-  } else {
-    Settings.properties.sec = 0;
-    Settings.properties.min = 0;
-    time.innerHTML = '0s';
-  }
+  Settings.properties.sec = 0;
+  Settings.properties.min = 0;
+  time.innerHTML = '0s';
 
   let numberOfAllPazzles = N * N;
 
   if (Settings.properties.saveMode) numberOfAllPazzles = Settings.properties.game[0] ** 2;
 
-  let numsArr = [];
-  for (let i = 1; i < numberOfAllPazzles; i += 1) {
-    numsArr.push(i);
-  }
-  numsArr.push(0);
-  history = shuffle(numsArr, N);
-
+  const chainAndHistory = shuffle(N);
+  history = chainAndHistory.history;
+  let numsArr = chainAndHistory.chain;
   const mainField = document.createElement('div');
   mainField.classList.add('game-board');
   document.body.appendChild(mainField);
@@ -228,11 +221,9 @@ async function createField(N) {
   let numOfImage = Math.floor(Math.random() * (151 - 1)) + 1;
 
   if (Settings.properties.saveMode) {
-    numsArr = Settings.properties.game[1];
-    history = Settings.properties.game[2];
-    numOfImage = Settings.properties.game[6];
     const stepNumber = document.querySelector('.step');
-    stepNumber.innerHTML = Settings.properties.game[3];
+    [, numsArr, history, stepNumber.innerHTML, Settings.properties.min,
+      Settings.properties.sec, numOfImage] = Settings.properties.game;
 
     time.innerHTML = Settings.properties.min ? `${Settings.properties.min}m ${Settings.properties.sec}s` : `${Settings.properties.sec}s`;
 
@@ -293,7 +284,7 @@ async function createField(N) {
 
     const fir = 100 * koefCol;
     const sec = 100 * koefRow;
-    
+
     puzzle.style.setProperty('background', `no-repeat url(./assets/images/${numOfImage}.jpg) ${fir}% ${sec}% / ${N * 100}%`);
     Settings.properties.num = numOfImage;
 
@@ -317,7 +308,7 @@ async function createField(N) {
       }
 
       if (Settings.properties.volume) {
-        new Audio(sound).play();
+        new Audio('./assets/sounds/click_on_puzzle.mp3').play();
       }
 
       const stepNumber = document.querySelector('.step');
