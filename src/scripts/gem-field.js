@@ -1,4 +1,10 @@
 import Settings from './settings.js';
+import sound from '../assets/sounds/click_on_puzzle.mp3';
+
+function importAll(r) {
+  return r.keys().map(r);
+}
+importAll(require.context('../assets/images/', false, /\.(png|jpe?g|svg)$/));
 
 let history;
 
@@ -287,7 +293,7 @@ async function createField(N) {
 
     const fir = 100 * koefCol;
     const sec = 100 * koefRow;
-
+    
     puzzle.style.setProperty('background', `no-repeat url(./assets/images/${numOfImage}.jpg) ${fir}% ${sec}% / ${N * 100}%`);
     Settings.properties.num = numOfImage;
 
@@ -311,7 +317,7 @@ async function createField(N) {
       }
 
       if (Settings.properties.volume) {
-        new Audio('./assets/sounds/click_on_puzzle.mp3').play();
+        new Audio(sound).play();
       }
 
       const stepNumber = document.querySelector('.step');
