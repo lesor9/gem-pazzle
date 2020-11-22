@@ -240,7 +240,7 @@ async function createField(N) {
     const puzzle = document.createElement('div');
     mainField.appendChild(puzzle);
 
-    if (numsArr[i] === 0) continue;
+    if (Number(numsArr[i]) === 0) continue;
 
     puzzle.innerHTML = numsArr[i];
     puzzle.classList.add('puzzle');
@@ -478,7 +478,7 @@ function autoSolver() {
   solverBtn.disabled = true;
 
   for (let j = 0; j < numberOfAllPazzles; j += 1) {
-    if (mainField.children[j].innerHTML === history[history.length - 1]) {
+    if (Number(mainField.children[j].innerHTML) === history[history.length - 1]) {
       history.pop();
       mainField.children[j].click();
       break;
